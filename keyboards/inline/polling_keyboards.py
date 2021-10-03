@@ -3,8 +3,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 gender_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Муж", callback_data="male"),
-            InlineKeyboardButton(text="Жен", callback_data="female"),
+            InlineKeyboardButton(text="Муж", callback_data="Мужской"),
+            InlineKeyboardButton(text="Жен", callback_data="Женский"),
         ]
     ]
 )
@@ -12,11 +12,11 @@ gender_keyboard = InlineKeyboardMarkup(
 roommate_gender_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Муж", callback_data="male"),
-            InlineKeyboardButton(text="Жен", callback_data="female"),
+            InlineKeyboardButton(text="Муж", callback_data="Мужской"),
+            InlineKeyboardButton(text="Жен", callback_data="Женский"),
         ],
         [
-            InlineKeyboardButton(text="Не важно", callback_data="no")
+            InlineKeyboardButton(text="Не важно", callback_data="Не важно")
         ]
     ]
 )
