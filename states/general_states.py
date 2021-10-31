@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 class GeneralStates(StatesGroup):
     main_menu = State()
     questionnaire_edit = State()
+    questionnaire_searching = State()
     questionnaire_editing_field = State()
     edited_gender = State()
     edited_roommate_gender = State()

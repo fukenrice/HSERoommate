@@ -26,22 +26,28 @@ class DataBase:
     def add_user(self, telegram_id: int, name: str, age: int, gender: str, roommate_gender: str,
                  smoking: int, number_of_rooms: int, about: str, photo_id: str):
         sql = f"""
-        INSERT INTO questionnaires
+        INSERT INTO questionnaires(telegram_id, name, age, gender, roommate_gender, smoking, rooms_number, about, photo_id)
         VALUES ({telegram_id}, '{name}', {age}, '{gender}', '{roommate_gender}', {smoking}, {number_of_rooms}, '{about}', '{photo_id}')
         """
         self.__execute(sql, commit=True)
 
-    def questionnaire_in_table(self, telegram_id: int) -> bool:
-        sql = f"""
-        SELECT EXISTS(SELECT telegram_id FROM questionnaires
-        WHERE telegram_id = {telegram_id})
-        """
-        if self.__execute(sql, fetchone=True)[0] == 0:
-            return False
+    def questionnaire_in_table(self, telegram_id: int = None, search_id: int = -1, roommate_gender: str = None) -> bool:
+        if search_id == -1:
+            sql = f"""
+            SELECT EXISTS(SELECT telegram_id FROM questionnaires
+            WHERE telegram_id = {telegram_id})
+            """
+            if self.__execute(sql, fetchone=True)[0] == 0:
+                return False
+            else:
+                return True
         else:
-            return True
+            if self.get_next_questionnaire_by_search_id(search_id, roommate_gender) is None:
+                return False
+            else:
+                return True
 
-    def get_questionnaire(self, telegram_id: int):
+    def get_questionnaire_by_urser_id(self, telegram_id: int):
         sql = f"""
         SELECT * FROM questionnaires
         WHERE telegram_id = {telegram_id}
@@ -62,3 +68,24 @@ class DataBase:
         WHERE telegram_id = {telegram_id}
         """
         self.__execute(sql, commit=True)
+
+    def get_next_questionnaire_by_search_id(self, search_id: int, roommate_gender: str):
+        if roommate_gender == "Не важно":
+            sql = f"""
+                SELECT * FROM questionnaires
+                WHERE ID = (select min(ID) from questionnaires where ID >= {search_id})
+            """
+        else:
+            sql = f"""
+            SELECT * FROM questionnaires
+            WHERE gender = '{roommate_gender}' AND ID = (select min(ID) from questionnaires where ID >= {search_id})
+            """
+        return self.__execute(sql, fetchone=True)
+
+    def questionnaire_by_search_id(self, search_id: int):
+        sql = f"""
+        SELECT * FROM questionnaires
+        WHERE ID = {search_id}
+        """
+        return self.__execute(sql, fetchone=True)
+

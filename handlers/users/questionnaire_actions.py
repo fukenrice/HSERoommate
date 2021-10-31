@@ -9,8 +9,9 @@ from states.general_states import GeneralStates
 
 @dp.message_handler(Command("my_questionnaire"), state="*")
 async def show_questionnaire(msg: types.Message):
-    if db.questionnaire_in_table(msg.from_user.id):
-        questionnaire = Questionnaire(db.get_questionnaire(msg.from_user.id))
+    await msg.answer("Убираю клавиатуру...", reply_markup=types.ReplyKeyboardRemove())
+    if db.questionnaire_in_table(telegram_id=msg.from_user.id):
+        questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
         await msg.answer_photo(photo=questionnaire.photo, caption=f"Вот твоя анкета:\n"
                                                                   f"Пол: {questionnaire.gender}\n"
                                                                   f"Пол соседа: {questionnaire.roommate_gender}\n"

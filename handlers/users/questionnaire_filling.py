@@ -5,11 +5,14 @@ from aiogram.dispatcher.filters import Command
 from keyboards.inline import gender_keyboard, roommate_gender_keyboard, binary_keyboard
 from loader import dp, bot, db
 from states.questionnaire_states import QuestionnaireStates
+from states.general_states import GeneralStates
 
 
 @dp.message_handler(Command("new_questionnaire"), state="*")
 async def start_polling(msg: types.Message, state: FSMContext):
-    if db.questionnaire_in_table(msg.from_user.id):
+    await msg.answer("Убираю клавиатуру...", reply_markup=types.ReplyKeyboardRemove())
+    await GeneralStates.main_menu.set()
+    if db.questionnaire_in_table(telegram_id=msg.from_user.id):
         await msg.answer(text="Ваша анкета уже находится в базе, вы можете ее удалить, а потом создать новую.")
         await state.finish()
     else:
@@ -20,7 +23,7 @@ async def start_polling(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=QuestionnaireStates.name_question)
 async def age_question(msg: types.Message, state: FSMContext):
-    await state.update_data(name=msg.text[:40])
+    await state.update_data(name=msg.text[:20])
     await msg.answer(text="Ваш возраст?")
     await QuestionnaireStates.age_question.set()
 
@@ -81,7 +84,7 @@ async def about_question(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=QuestionnaireStates.photo_question)
 async def photo_question(msg: types.Message, state: FSMContext):
-    await state.update_data(about=msg.text[:869])
+    await state.update_data(about=msg.text[:799])
     await msg.answer(text="Отлично, для завершения заполнения анкеты отправьте мне вашу фотографию")
     await QuestionnaireStates.end_of_questionnaire.set()
 
