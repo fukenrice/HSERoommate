@@ -2,36 +2,39 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
-from models.questionnaire import Questionnaire
 from keyboards.default import scrolling_keyboard
 from loader import dp, bot, db
+from models.questionnaire import Questionnaire
 from states.general_states import GeneralStates
+
+
+async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questionnaire, state: FSMContext):
+    await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"{roommate_questionnaire.name}\n"
+                                                                       f"Пол: {roommate_questionnaire.gender}\n"
+                                                                       f"{roommate_questionnaire}\n",
+                           reply_markup=scrolling_keyboard)
+    async with state.proxy() as data:
+        data["current_id"] = roommate_questionnaire.id + 1
 
 
 async def show_next(user_questionnaire: Questionnaire, search_id: int, msg: types.message, state: FSMContext):
     # Есть ли вообще записи в таблице
-    if db.questionnaire_in_table(search_id=0, roommate_gender=user_questionnaire.roommate_gender):
+    if db.questionnaire_in_table(search_id=0, roommate_gender=user_questionnaire.roommate_gender,
+                                 telegram_id=user_questionnaire.telegram_id):
         # Если есть след запись
-        if db.questionnaire_in_table(search_id=search_id, roommate_gender=user_questionnaire.roommate_gender):
+        if db.questionnaire_in_table(search_id=search_id, roommate_gender=user_questionnaire.roommate_gender,
+                                     telegram_id=user_questionnaire.telegram_id):
             roommate_questionnaire = Questionnaire(
-                db.get_next_questionnaire_by_search_id(search_id, user_questionnaire.roommate_gender))
-            await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"{roommate_questionnaire.name}\n"
-                                                                               f"Пол: {roommate_questionnaire.gender}\n"
-                                                                               f"{roommate_questionnaire}\n",
-                                   reply_markup=scrolling_keyboard)
-            async with state.proxy() as data:
-                data["current_id"] = roommate_questionnaire.id + 1
+                db.get_next_questionnaire_by_search_id(search_id, user_questionnaire.roommate_gender,
+                                                       ignore_tg_id=user_questionnaire.telegram_id))
+            await send_questionnaire(msg, roommate_questionnaire, state)
         # Показываем первую, запускаем второй круг
         else:
             search_id = 0
             roommate_questionnaire = Questionnaire(
-                db.get_next_questionnaire_by_search_id(search_id, user_questionnaire.roommate_gender))
-            async with state.proxy() as data:
-                data["current_id"] = roommate_questionnaire.id + 1
-            await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"{roommate_questionnaire.name}\n"
-                                                                               f"Пол: {roommate_questionnaire.gender}\n"
-                                                                               f"{roommate_questionnaire}\n",
-                                   reply_markup=scrolling_keyboard)
+                db.get_next_questionnaire_by_search_id(search_id, user_questionnaire.roommate_gender,
+                                                       ignore_tg_id=user_questionnaire.telegram_id))
+            await send_questionnaire(msg, roommate_questionnaire, state)
     # Записей, подходящих под условие нет совсем
     else:
         await msg.answer(
@@ -41,7 +44,7 @@ async def show_next(user_questionnaire: Questionnaire, search_id: int, msg: type
 
 
 @dp.message_handler(Command("show"), state="*")
-async def start_polling(msg: types.Message, state: FSMContext):
+async def start_scrolling(msg: types.Message, state: FSMContext):
     await GeneralStates.questionnaire_searching.set()
     # Если нету анкеты самого пользователя в бд.
     if not db.questionnaire_in_table(telegram_id=msg.from_user.id):
@@ -81,11 +84,11 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
         other_questionnaire = Questionnaire(liked)
 
         await bot.send_photo(chat_id=other_questionnaire.telegram_id, photo=user_questionnaire.photo,
-                                                                       caption=f"Ваша анкта понравилась человеку:\n"
-                                                                       f"{user_questionnaire.name}\n"
-                                                                       f"Пол: {user_questionnaire.gender}\n"
-                                                                       f"{user_questionnaire}\n"
-                                                                       f"Вот его ник тг: @{msg.from_user.username}")
+                             caption=f"Ваша анкта понравилась человеку:\n"
+                                     f"{user_questionnaire.name}\n"
+                                     f"Пол: {user_questionnaire.gender}\n"
+                                     f"{user_questionnaire}\n"
+                                     f"Вот его ник тг: @{msg.from_user.username}")
 
     await show_next(user_questionnaire, search_id, msg, state)
 

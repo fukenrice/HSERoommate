@@ -42,7 +42,7 @@ class DataBase:
             else:
                 return True
         else:
-            if self.get_next_questionnaire_by_search_id(search_id, roommate_gender) is None:
+            if self.get_next_questionnaire_by_search_id(search_id, roommate_gender, telegram_id) is None:
                 return False
             else:
                 return True
@@ -69,16 +69,19 @@ class DataBase:
         """
         self.__execute(sql, commit=True)
 
-    def get_next_questionnaire_by_search_id(self, search_id: int, roommate_gender: str):
+    def get_next_questionnaire_by_search_id(self, search_id: int, roommate_gender: str, ignore_tg_id: int):
         if roommate_gender == "Не важно":
             sql = f"""
                 SELECT * FROM questionnaires
                 WHERE ID = (select min(ID) from questionnaires where ID >= {search_id})
+                AND telegram_id <> {ignore_tg_id}
             """
         else:
             sql = f"""
             SELECT * FROM questionnaires
-            WHERE gender = '{roommate_gender}' AND ID = (select min(ID) from questionnaires where ID >= {search_id})
+            WHERE gender = '{roommate_gender}'
+            AND ID = (select min(ID) from questionnaires where ID >= {search_id})
+            AND telegram_id <> {ignore_tg_id}
             """
         return self.__execute(sql, fetchone=True)
 
