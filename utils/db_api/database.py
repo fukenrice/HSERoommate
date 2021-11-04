@@ -14,12 +14,13 @@ class DataBase:
         data = None
         cursor.execute(sql)
 
-        if commit:
-            conn.commit()
+
         if fetchall:
             data = cursor.fetchall()
         if fetchone:
             data = cursor.fetchone()
+        if commit:
+            conn.commit()
         conn.close()
         return data
 
@@ -37,22 +38,16 @@ class DataBase:
             SELECT EXISTS(SELECT telegram_id FROM questionnaires
             WHERE telegram_id = {telegram_id})
             """
-            if self.__execute(sql, fetchone=True)[0] == 0:
-                return False
-            else:
-                return True
+            return not self.__execute(sql, fetchone=True, commit=True)[0] == 0
         else:
-            if self.get_next_questionnaire_by_search_id(search_id, roommate_gender, telegram_id) is None:
-                return False
-            else:
-                return True
+            return not self.get_next_questionnaire_by_search_id(search_id, roommate_gender, telegram_id) is None
 
     def get_questionnaire_by_urser_id(self, telegram_id: int):
         sql = f"""
         SELECT * FROM questionnaires
         WHERE telegram_id = {telegram_id}
         """
-        return self.__execute(sql, fetchone=True)
+        return self.__execute(sql, fetchone=True, commit=True)
 
     def delete_questionnaire(self, telegram_id: int):
         sql = f"""
@@ -73,22 +68,20 @@ class DataBase:
         if roommate_gender == "Не важно":
             sql = f"""
                 SELECT * FROM questionnaires
-                WHERE ID = (select min(ID) from questionnaires where ID >= {search_id})
-                AND telegram_id <> {ignore_tg_id}
+                WHERE ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
             """
         else:
             sql = f"""
             SELECT * FROM questionnaires
             WHERE gender = '{roommate_gender}'
-            AND ID = (select min(ID) from questionnaires where ID >= {search_id})
-            AND telegram_id <> {ignore_tg_id}
+            AND ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
             """
-        return self.__execute(sql, fetchone=True)
+        return self.__execute(sql, fetchone=True, commit=True)
 
     def questionnaire_by_search_id(self, search_id: int):
         sql = f"""
         SELECT * FROM questionnaires
         WHERE ID = {search_id}
         """
-        return self.__execute(sql, fetchone=True)
+        return self.__execute(sql, fetchone=True, commit=True)
 
