@@ -16,7 +16,7 @@ roommate_gender_keyboard = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Жен", callback_data="Женский"),
         ],
         [
-            InlineKeyboardButton(text="Не важно", callback_data="Не важно")
+            InlineKeyboardButton(text="Неважно", callback_data="Неважно")
         ]
     ]
 )
