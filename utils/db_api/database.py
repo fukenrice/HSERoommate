@@ -25,10 +25,10 @@ class DataBase:
         return data
 
     def add_user(self, telegram_id: int, name: str, age: int, gender: str, roommate_gender: str,
-                 smoking: int, number_of_rooms: int, about: str, photo_id: str):
+                 smoking: int, number_of_rooms: str, about: str, photo_id: str):
         sql = f"""
         INSERT INTO questionnaires(telegram_id, name, age, gender, roommate_gender, smoking, rooms_number, about, photo_id)
-        VALUES ({telegram_id}, '{name}', {age}, '{gender}', '{roommate_gender}', {smoking}, {number_of_rooms}, '{about}', '{photo_id}')
+        VALUES ({telegram_id}, '{name}', {age}, '{gender}', '{roommate_gender}', {smoking}, '{number_of_rooms}', '{about}', '{photo_id}')
         """
         self.__execute(sql, commit=True)
 
