@@ -30,5 +30,17 @@ binary_keyboard = InlineKeyboardMarkup(
     ]
 )
 
+room_num_keyboard = InlineKeyboardMarkup (
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="1-2", callback_data="1-2"),
+            InlineKeyboardButton(text="2-3", callback_data="2-3"),
+            InlineKeyboardButton(text="3-4", callback_data="3-4")
+        ],
+        [
+            InlineKeyboardButton(text="Не важно", callback_data="Не важно")
+        ]
+    ]
+)
 
 
