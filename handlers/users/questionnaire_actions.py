@@ -9,7 +9,6 @@ from states.general_states import GeneralStates
 
 @dp.message_handler(Command("my_questionnaire"), state="*")
 async def show_questionnaire(msg: types.Message):
-    await msg.answer("Убираю клавиатуру...", reply_markup=types.ReplyKeyboardRemove())
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
         questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
         await msg.answer_photo(photo=questionnaire.photo, caption=f"Вот твоя анкета:\n"
@@ -21,7 +20,8 @@ async def show_questionnaire(msg: types.Message):
 
     else:
         await msg.answer(
-            text="Хм, не могу найти твою анкету в базе, ты можешь создать ее с помощью команды /new_questionnaire")
+            text="Хм, не могу найти твою анкету в базе, ты можешь создать ее с помощью команды /new_questionnaire",
+            reply_markup=types.ReplyKeyboardRemove())
 
 
 @dp.callback_query_handler(text="delete", state=GeneralStates.questionnaire_edit)
