@@ -8,7 +8,7 @@ from models import Questionnaire
 from states.general_states import GeneralStates
 
 
-@dp.message_handler(Command("my_questionnaire"), state="*")
+@dp.message_handler(Command("my_form"), state="*")
 async def show_questionnaire(msg: types.Message):
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
         questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
@@ -21,7 +21,7 @@ async def show_questionnaire(msg: types.Message):
 
     else:
         await msg.answer(
-            text="Хм, не могу найти твою анкету в базе, ты можешь создать ее с помощью команды /new_questionnaire",
+            text="Хм, не могу найти твою анкету в базе, ты можешь создать ее с помощью команды /new_form",
             reply_markup=types.ReplyKeyboardRemove())
 
 
@@ -29,7 +29,7 @@ async def show_questionnaire(msg: types.Message):
 async def delete_questionnaire(msg: types.Message, state: FSMContext):
     db.delete_questionnaire(msg.from_user.id)
     await msg.answer(text="Ваша акета успешно удалена, ее больше никто не увидит."
-                          " В любой момент вы можете создать новую при помощи команды /new_questionnaire",
+                          " В любой момент вы можете создать новую при помощи команды /new_form",
                      reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
 

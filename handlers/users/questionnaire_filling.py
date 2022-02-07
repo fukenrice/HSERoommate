@@ -8,7 +8,7 @@ from states.questionnaire_states import QuestionnaireStates
 from states.general_states import GeneralStates
 
 
-@dp.message_handler(Command("new_questionnaire"), state="*")
+@dp.message_handler(Command("new_form"), state="*")
 async def start_polling(msg: types.Message, state: FSMContext):
     await GeneralStates.main_menu.set()
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
