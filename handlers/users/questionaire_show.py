@@ -9,8 +9,7 @@ from states.general_states import GeneralStates
 
 
 async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questionnaire, state: FSMContext):
-    await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"{roommate_questionnaire.name}\n"
-                                                                       f"Пол: {roommate_questionnaire.gender}\n"
+    await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"Пол: {roommate_questionnaire.gender}\n"
                                                                        f"{roommate_questionnaire}\n",
                            reply_markup=scrolling_keyboard)
     async with state.proxy() as data:
@@ -85,7 +84,6 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
 
         await bot.send_photo(chat_id=other_questionnaire.telegram_id, photo=user_questionnaire.photo,
                              caption=f"Ваша анкта понравилась человеку:\n"
-                                     f"{user_questionnaire.name}\n"
                                      f"Пол: {user_questionnaire.gender}\n"
                                      f"{user_questionnaire}\n"
                                      f"Вот его ник тг: @{msg.from_user.username}")
