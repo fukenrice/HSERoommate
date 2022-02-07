@@ -6,7 +6,7 @@ from keyboards.default import scrolling_keyboard
 from loader import dp, bot, db
 from models.questionnaire import Questionnaire
 from states.general_states import GeneralStates
-
+from data.config import MODERATOR as moder
 
 async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questionnaire, state: FSMContext):
     await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"Пол: {roommate_questionnaire.gender}\n"
@@ -38,7 +38,7 @@ async def show_next(user_questionnaire: Questionnaire, search_id: int, msg: type
     else:
         await msg.answer(
             text="В нашей базе пока нет анкет, подходящих под ваши фильтры, попробуйте поменять пол соседа или "
-                 "дождаться появления анкеты с нужными критериями")
+                 "дождаться появления анкеты с нужными критериями", reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
 
 
@@ -48,7 +48,8 @@ async def start_scrolling(msg: types.Message, state: FSMContext):
     # Если нету анкеты самого пользователя в бд.
     if not db.questionnaire_in_table(telegram_id=msg.from_user.id):
         await msg.answer(
-            text="Для просмотра чужих анкет, пожалуйста, сначала добавьте свою при помощи команды /new_questionnaire")
+            text="Для просмотра чужих анкет, пожалуйста, сначала добавьте свою при помощи команды /new_form",
+            reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
     else:
         # Получение анкеты пользователя из бд для параметров поиска.
@@ -63,9 +64,20 @@ async def start_scrolling(msg: types.Message, state: FSMContext):
         await show_next(user_questionnaire, search_id, msg, state)
 
 
-@dp.message_handler(lambda message: (message.text == "\N{THUMBS DOWN SIGN}"),
+@dp.message_handler(lambda message: message.text in ["\N{THUMBS DOWN SIGN}", "\N{Squared Sos}"],
                     state=GeneralStates.questionnaire_searching)
 async def continue_scrolling_negative(msg: types.Message, state: FSMContext):
+    if msg.text == "\N{Squared Sos}":
+        async with state.proxy() as data:
+            search_id = data["current_id"]
+        reported = db.questionnaire_by_search_id(search_id - 1)
+
+        if reported is not None:
+            reported_questionnaire = Questionnaire(reported)
+            await bot.send_photo(chat_id=moder, photo=reported_questionnaire.photo, caption=f"Зарепортили анкету:\n"
+                                                 f"{reported_questionnaire}\n"
+                                                 f"id: {reported_questionnaire.telegram_id}")
+
     user_questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
     async with state.proxy() as data:
         search_id = data["current_id"]
@@ -82,11 +94,14 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
     if liked is not None:
         other_questionnaire = Questionnaire(liked)
 
-        await bot.send_photo(chat_id=other_questionnaire.telegram_id, photo=user_questionnaire.photo,
-                             caption=f"Ваша анкта понравилась человеку:\n"
-                                     f"Пол: {user_questionnaire.gender}\n"
-                                     f"{user_questionnaire}\n"
-                                     f"Вот его ник тг: @{msg.from_user.username}")
+        try:
+            await bot.send_photo(chat_id=other_questionnaire.telegram_id, photo=user_questionnaire.photo,
+                                 caption=f"Ваша анкта понравилась человеку:\n"
+                                         f"Пол: {user_questionnaire.gender}\n"
+                                         f"{user_questionnaire}\n"
+                                         f"Вот его ник тг: @{msg.from_user.username}")
+        except Exception:
+            pass  # Можно добавить удаление из бд и сообщение ищущему, что пользователь перестал пользоваться сервисом.
 
     await show_next(user_questionnaire, search_id, msg, state)
 
