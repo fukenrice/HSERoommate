@@ -3,8 +3,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 my_questionnaire_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
+            KeyboardButton(text="Редактировать анкету"),
             KeyboardButton(text="Удалить анктеу"),
-            KeyboardButton(text="Редактировать анкету")
         ]
     ], resize_keyboard=True
 )
