@@ -13,9 +13,9 @@ async def show_questionnaire(msg: types.Message):
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
         questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
         await msg.answer_photo(photo=questionnaire.photo, caption=f"Вот твоя анкета:\n"
+                                                                  f"{questionnaire}\n"
                                                                   f"Пол: {questionnaire.gender}\n"
-                                                                  f"Пол соседа: {questionnaire.roommate_gender}\n"
-                                                                  f"{questionnaire}\n",
+                                                                  f"Пол соседа: {questionnaire.roommate_gender}",
                                reply_markup=keyboard.my_questionnaire_keyboard)
         await GeneralStates.questionnaire_edit.set()
 

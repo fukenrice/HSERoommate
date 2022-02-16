@@ -8,6 +8,7 @@ from models.questionnaire import Questionnaire
 from states.general_states import GeneralStates
 from data.config import MODERATOR as moder
 
+
 async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questionnaire, state: FSMContext):
     await msg.answer_photo(photo=roommate_questionnaire.photo, caption=f"Пол: {roommate_questionnaire.gender}\n"
                                                                        f"{roommate_questionnaire}\n",
@@ -64,10 +65,10 @@ async def start_scrolling(msg: types.Message, state: FSMContext):
         await show_next(user_questionnaire, search_id, msg, state)
 
 
-@dp.message_handler(lambda message: message.text in ["\N{THUMBS DOWN SIGN}", "\N{Squared Sos}"],
+@dp.message_handler(lambda message: message.text in ["\N{THUMBS DOWN SIGN}", "\N{Squared Sos} Пожаловаться"],
                     state=GeneralStates.questionnaire_searching)
 async def continue_scrolling_negative(msg: types.Message, state: FSMContext):
-    if msg.text == "\N{Squared Sos}":
+    if msg.text == "\N{Squared Sos} Пожаловаться":
         async with state.proxy() as data:
             search_id = data["current_id"]
         reported = db.questionnaire_by_search_id(search_id - 1)
@@ -106,7 +107,7 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
     await show_next(user_questionnaire, search_id, msg, state)
 
 
-@dp.message_handler(lambda message: message.text == "\N{Octagonal Sign}", state=GeneralStates.questionnaire_searching)
+@dp.message_handler(lambda message: message.text == "\N{Octagonal Sign} Остановить поиск", state=GeneralStates.questionnaire_searching)
 async def stop_scrolling(msg: types.Message, state: FSMContext):
     await msg.answer(text="Надеемся, вы кого-нибудь нашли, ждем вас снова)", reply_markup=types.ReplyKeyboardRemove())
     await GeneralStates.main_menu.set()

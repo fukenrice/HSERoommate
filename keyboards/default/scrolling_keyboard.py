@@ -5,10 +5,10 @@ scrolling_keyboard = ReplyKeyboardMarkup(
         [
             KeyboardButton("\N{THUMBS UP SIGN}"),
             KeyboardButton("\N{THUMBS DOWN SIGN}"),
-            KeyboardButton("\N{Squared Sos}"),
+            KeyboardButton("\N{Squared Sos} Пожаловаться"),
         ],
         [
-            KeyboardButton("\N{Octagonal Sign}"),
+            KeyboardButton("\N{Octagonal Sign} Остановить поиск"),
         ]
     ], resize_keyboard=True
 )
