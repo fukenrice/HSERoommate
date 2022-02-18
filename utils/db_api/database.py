@@ -25,10 +25,13 @@ class DataBase:
         return data
 
     def add_user(self, telegram_id: int, name: str, age: int, gender: str, roommate_gender: str,
-                 smoking: int, number_of_rooms: str, about: str, photo_id: str):
+                 smoking: int, number_of_rooms: str, about: str, photo_id: str, how_long: str,
+                 location: str, local_location: str, pet: str, budget: str, found: str):
         sql = f"""
-        INSERT INTO questionnaires(telegram_id, name, age, gender, roommate_gender, smoking, rooms_number, about, photo_id)
-        VALUES ({telegram_id}, '{name}', {age}, '{gender}', '{roommate_gender}', {smoking}, '{number_of_rooms}', '{about}', '{photo_id}')
+        INSERT INTO questionnaires(telegram_id, name, age, gender, roommate_gender, smoking, rooms_number, about,
+         photo_id, how_long, location, local_location, pet, budget, found )
+        VALUES ({telegram_id}, '{name}', {age}, '{gender}', '{roommate_gender}', {smoking}, '{number_of_rooms}', '{about}',
+         '{photo_id}', '{how_long}', '{location}', '{local_location}', '{pet}', '{budget}', '{found}')
         """
         self.__execute(sql, commit=True)
 
@@ -65,7 +68,7 @@ class DataBase:
         self.__execute(sql, commit=True)
 
     def get_next_questionnaire_by_search_id(self, search_id: int, roommate_gender: str, ignore_tg_id: int):
-        if roommate_gender == "Не важно":
+        if roommate_gender == "Неважно":
             sql = f"""
                 SELECT * FROM questionnaires
                 WHERE ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
