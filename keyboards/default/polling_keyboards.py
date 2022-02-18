@@ -7,7 +7,7 @@ roommate_gender_keyboard = ReplyKeyboardMarkup(
             KeyboardButton("Жен")
         ],
         [
-            KeyboardButton("Не важно")
+            KeyboardButton("Неважно")
         ]
     ], resize_keyboard=True
 )
@@ -17,6 +17,58 @@ gender_keyboard = ReplyKeyboardMarkup(
         [
             KeyboardButton("Муж"),
             KeyboardButton("Жен")
+        ]
+    ], resize_keyboard=True
+)
+
+how_long_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton("Менее месяца"),
+            KeyboardButton("От месяца до полугода"),
+            KeyboardButton("Более полугода")
+        ]
+    ], resize_keyboard=True
+)
+
+location_global_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton("Внутри ЦАО"),
+            KeyboardButton("В пределах ТТК"),
+            KeyboardButton("В пределах МКАД"),
+            KeyboardButton("За МКАД")
+        ],
+        [
+            KeyboardButton("Неважно")
+        ]
+    ], resize_keyboard=True
+)
+
+location_local_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton("Запад"),
+            KeyboardButton("Восток"),
+            KeyboardButton("Север"),
+            KeyboardButton("Юг")
+        ],
+        [
+            KeyboardButton("Неважно")
+        ]
+    ], resize_keyboard=True
+)
+
+budget_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton("10-15к"),
+            KeyboardButton("15-25к"),
+            KeyboardButton("25-35к"),
+            KeyboardButton("35к+")
+        ],
+        [
+            KeyboardButton("Неважно")
         ]
     ], resize_keyboard=True
 )
@@ -38,7 +90,7 @@ room_num_keyboard = ReplyKeyboardMarkup(
             KeyboardButton("3-4"),
         ],
         [
-            KeyboardButton("Не важно")
+            KeyboardButton("Неважно")
         ]
-    ]
+    ], resize_keyboard=True
 )
