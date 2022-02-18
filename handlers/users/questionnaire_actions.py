@@ -86,7 +86,7 @@ async def change_location_global(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text in ["Внутри ЦАО", "В пределах ТТК", "В пределах МКАД", "За МКАД", "Неважно"], state=GeneralStates.edited_location_global)
 async def apply_location_global(msg: types.Message, state: FSMContext):
-    db.change_field('location_global', f"'{msg.text}'", telegram_id=msg.from_user.id)
+    db.change_field('location', f"'{msg.text}'", telegram_id=msg.from_user.id)
     await msg.answer(text="Местоположение успешно изменено", reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
 
@@ -99,7 +99,7 @@ async def change_location_local(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text in ["Запад", "Восток", "Север", "Юг", "Неважно"], state=GeneralStates.edited_location_local)
 async def apply_location_local(msg: types.Message, state: FSMContext):
-    db.change_field('location_local', f"'{msg.text}'", telegram_id=msg.from_user.id)
+    db.change_field('local_location', f"'{msg.text}'", telegram_id=msg.from_user.id)
     await msg.answer(text="Местоположение успешно изменено", reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
 
@@ -112,7 +112,7 @@ async def change_apartment(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=GeneralStates.edited_apartment)
 async def apply_apartment(msg: types.Message, state: FSMContext):
-    db.change_field('apartment', f"'{msg.text}'", telegram_id=msg.from_user.id)
+    db.change_field('found', f"'{msg.text}'", telegram_id=msg.from_user.id)
     await msg.answer(text="Данные о квартире успешно изменены", reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
 
@@ -128,6 +128,7 @@ async def apply_pet(msg: types.Message, state: FSMContext):
     db.change_field('pet', f"'{msg.text}'", telegram_id=msg.from_user.id)
     await msg.answer(text="Данные о животных успешно изменены", reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
+
 
 @dp.message_handler(lambda msg: msg.text == "Пол соседа", state=GeneralStates.questionnaire_editing_field)
 async def change_roommate_gender(msg: types.Message):
