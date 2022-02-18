@@ -22,6 +22,16 @@ edit_questionnaire_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text="О себе")
         ],
         [
+            KeyboardButton(text="Местоположение"),
+            KeyboardButton(text="Местоположение (уточн.)")
+        ],
+        [
+            KeyboardButton(text="Бюджет"),
+            KeyboardButton(text="Длительность проживания")
+        ],
+        [
+            KeyboardButton(text="Квартира"),
+            KeyboardButton(text="Животные"),
             KeyboardButton(text="Фото")
         ]
     ], resize_keyboard=True
