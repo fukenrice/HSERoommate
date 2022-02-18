@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
-from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard
+from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard, how_long_keyboard, budget_keyboard, location_local_keyboard, location_global_keyboard
 from loader import dp, bot, db
 from states.questionnaire_states import QuestionnaireStates
 from states.general_states import GeneralStates
@@ -44,28 +44,69 @@ async def roommate_gender_question(msg: types.Message, state: FSMContext):
     await QuestionnaireStates.roommate_gender_question.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["Муж", "Жен", "Не важно"], state=QuestionnaireStates.roommate_gender_question)
-async def smoking_question(msg: types.Message, state: FSMContext):
+@dp.message_handler(lambda msg: msg.text in ["Муж", "Жен", "Неважно"], state=QuestionnaireStates.roommate_gender_question)
+async def how_long_question(msg: types.Message, state: FSMContext):
     await state.update_data(roommate_gender=msg.text)
+    await msg.answer(text="В течение какого времени Вы хотите снимать квартиру?", reply_markup=how_long_keyboard)
+    await QuestionnaireStates.how_long_question.set()
+
+
+@dp.message_handler(lambda msg: msg.text in ["Менее месяца", "От месяца до полугода", "Более полугода"], state=QuestionnaireStates.how_long_question)
+async def location_global_question(msg: types.Message, state: FSMContext):
+    await state.update_data(how_long=msg.text)
+    await msg.answer(text="Где бы Вы хотели жить?", reply_markup=location_global_keyboard)
+    await QuestionnaireStates.location_global_question.set()
+
+
+@dp.message_handler(lambda msg: msg.text in ["Внутри ЦАО", "В пределах ТТК", "В пределах МКАД", "За МКАД", "Неважно"], state=QuestionnaireStates.location_global_question)
+async def location_local_question(msg: types.Message, state: FSMContext):
+    await state.update_data(location_global=msg.text)
+    await msg.answer(text="А точнее?", reply_markup=location_local_keyboard)
+    await QuestionnaireStates.location_local_question.set()
+
+
+@dp.message_handler(lambda msg: msg.text in ["Запад", "Восток", "Север", "Юг", "Неважно"], state=QuestionnaireStates.location_local_question)
+async def pet_question(msg: types.Message, state: FSMContext):
+    await state.update_data(location_local=msg.text)
+    await msg.answer(text="Готовы ли Вы жить с соседом, у которого будет домашнее животное?", reply_markup=binary_keyboard)
+    await QuestionnaireStates.pet_question.set()
+
+
+@dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=QuestionnaireStates.pet_question)
+async def budget_question(msg: types.Message, state: FSMContext):
+    await state.update_data(pet=msg.text)
+    await msg.answer(text="Каков Ваш бюджет для аренды квартиры?", reply_markup=budget_keyboard)
+    await QuestionnaireStates.budget_question.set()
+
+
+@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+"], state=QuestionnaireStates.budget_question)
+async def apartment_question(msg: types.Message, state: FSMContext):
+    await state.update_data(budget=msg.text)
+    await msg.answer(text="Нашли ли Вы уже квартиру?", reply_markup=binary_keyboard)
+    await QuestionnaireStates.apartment_question.set()
+
+@dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=QuestionnaireStates.apartment_question)
+async def smoking_question(msg: types.Message, state: FSMContext):
+    await state.update_data(apartment=msg.text)
     await msg.answer(text="Вы курите?", reply_markup=binary_keyboard)
+    await QuestionnaireStates.smoking_question.set()
+
+
+@dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=QuestionnaireStates.smoking_question)
+async def rooms_number_question(msg: types.Message, state: FSMContext):
+    await state.update_data(smoking=msg.text)
+    await msg.answer(text="Желаемое количество комнат?", reply_markup=room_num_keyboard)
     await QuestionnaireStates.rooms_number_question.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=QuestionnaireStates.rooms_number_question)
-async def rooms_question(msg: types.Message, state: FSMContext):
-    await state.update_data(smoking=msg.text)
-    await msg.answer(text="Желаемое количество комнат?", reply_markup=room_num_keyboard)
-    await QuestionnaireStates.about_question.set()
-
-
-@dp.message_handler(lambda msg: msg.text in ["1-2", "2-3", "3-4", "Не важно"], state=QuestionnaireStates.about_question)
+@dp.message_handler(lambda msg: msg.text in ["1-2", "2-3", "3-4", "Неважно"], state=QuestionnaireStates.rooms_number_question)
 async def about_question(msg: types.Message, state: FSMContext):
     await state.update_data(rooms_number=str(msg.text))
     await msg.answer(text="Расскажите немного о себе, чтобы дать потенциальному соседу больше информации", reply_markup=types.ReplyKeyboardRemove())
-    await QuestionnaireStates.photo_question.set()
+    await QuestionnaireStates.about_question.set()
 
 
-@dp.message_handler(state=QuestionnaireStates.photo_question)
+@dp.message_handler(state=QuestionnaireStates.about_question)
 async def photo_question(msg: types.Message, state: FSMContext):
     await state.update_data(about=msg.text[:799])
     await msg.answer(text="Отлично, для завершения заполнения анкеты отправьте мне вашу фотографию", reply_markup=types.ReplyKeyboardRemove())
