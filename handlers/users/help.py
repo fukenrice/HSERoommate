@@ -4,6 +4,7 @@ from aiogram.dispatcher import FSMContext
 from loader import dp
 from states.general_states import GeneralStates
 
+
 @dp.message_handler(CommandHelp(), state="*")
 async def bot_help(message: types.Message, state: FSMContext):
     await GeneralStates.main_menu.set()
@@ -11,7 +12,9 @@ async def bot_help(message: types.Message, state: FSMContext):
             "Выбери команду my_form и нажми на соответствующую кнопку.\n",
             "Что делать, если бот лагает?",
             "Это связано с временной перегруженностью серверов - такое бывает крайне редко. Не волнуйся, в ближайшее время всё придёт в норму.\n",
+            "Как удалить анкету?",
+            "Зачем тебе удалять анкету? Просто отключи её, вдруг понадобится. В таком случае она всё равно не будет отображаться в поиске, а при необходимости ты всегда можешь к ней вернуться. Если всё же ты действительно хочешь её удалить - нажми на /my_form и на кнопку удалить анкету.\n",
             "Что делать, если я не нашёл ответ на свой вопрос?",
             "Писать в лс @ArsBars")
-    
+
     await message.answer("\n".join(text), reply_markup=types.ReplyKeyboardRemove())
