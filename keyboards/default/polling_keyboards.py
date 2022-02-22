@@ -21,6 +21,16 @@ gender_keyboard = ReplyKeyboardMarkup(
     ], resize_keyboard=True
 )
 
+smoking_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton("Да"),
+            KeyboardButton("Только электронные сигареты"),
+            KeyboardButton("Нет")
+        ]
+    ], resize_keyboard=True
+)
+
 how_long_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
