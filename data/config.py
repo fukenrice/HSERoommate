@@ -8,4 +8,4 @@ BOT_TOKEN = env.str("BOT_TOKEN")  # Забираем значение типа s
 ADMINS = env.list("ADMINS")
 IP = env.str("ip")
 DB_PATH = env.str("db")
-MODERATOR = env.int("MODERATOR")
+MODERATORS = env.list("MODERATORS")

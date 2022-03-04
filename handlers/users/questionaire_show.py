@@ -2,11 +2,11 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
-from keyboards.default import scrolling_keyboard
+from keyboards.default import scrolling_keyboard, main_keyboard
 from loader import dp, bot, db
 from models.questionnaire import Questionnaire
 from states.general_states import GeneralStates
-from data.config import MODERATOR as moder
+from data.config import MODERATORS as moder
 
 
 async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questionnaire, state: FSMContext):
@@ -39,18 +39,18 @@ async def show_next(user_questionnaire: Questionnaire, search_id: int, msg: type
     else:
         await msg.answer(
             text="В нашей базе пока нет анкет, подходящих под ваши фильтры, попробуйте поменять пол соседа или "
-                 "дождаться появления анкеты с нужными критериями", reply_markup=types.ReplyKeyboardRemove())
+                 "дождаться появления анкеты с нужными критериями", reply_markup=main_keyboard)
         await state.finish()
 
 
-@dp.message_handler(Command("show"), state="*")
+@dp.message_handler(lambda msg: msg.text in ["/show", "Посмотреть анкеты"], state="*")
 async def start_scrolling(msg: types.Message, state: FSMContext):
     await GeneralStates.questionnaire_searching.set()
     # Если нету анкеты самого пользователя в бд.
     if not db.questionnaire_in_table(telegram_id=msg.from_user.id):
         await msg.answer(
             text="Для просмотра чужих анкет, пожалуйста, сначала добавьте свою при помощи команды /new_form",
-            reply_markup=types.ReplyKeyboardRemove())
+            reply_markup=main_keyboard)
         await state.finish()
     else:
         # Получение анкеты пользователя из бд для параметров поиска.
@@ -71,13 +71,10 @@ async def continue_scrolling_negative(msg: types.Message, state: FSMContext):
     if msg.text == "\N{Squared Sos} Пожаловаться":
         async with state.proxy() as data:
             search_id = data["current_id"]
-        reported = db.questionnaire_by_search_id(search_id - 1)
+        reported = Questionnaire(db.questionnaire_by_search_id(search_id - 1))
 
         if reported is not None:
-            reported_questionnaire = Questionnaire(reported)
-            await bot.send_photo(chat_id=moder, photo=reported_questionnaire.photo, caption=f"Зарепортили анкету:\n"
-                                                 f"{reported_questionnaire}\n"
-                                                 f"id: {reported_questionnaire.telegram_id}")
+            db.add_reported(reported.telegram_id)
 
     user_questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
     async with state.proxy() as data:
@@ -109,5 +106,5 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda message: message.text == "\N{Octagonal Sign} Остановить поиск", state=GeneralStates.questionnaire_searching)
 async def stop_scrolling(msg: types.Message, state: FSMContext):
-    await msg.answer(text="Надеемся, вы кого-нибудь нашли, ждем вас снова)", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Надеемся, вы кого-нибудь нашли, ждем вас снова)", reply_markup=main_keyboard)
     await GeneralStates.main_menu.set()

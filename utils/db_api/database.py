@@ -88,3 +88,23 @@ class DataBase:
         """
         return self.__execute(sql, fetchone=True, commit=True)
 
+    def add_reported(self, telegram_id: int):
+        sql = f"""
+        INSERT OR IGNORE INTO reported(telegram_id)
+        VALUES ({telegram_id})
+        """
+        return self.__execute(sql, commit=True)
+
+    def get_next_reported_que(self):
+        sql = f"""
+        SELECT * FROM reported
+        WHERE ID = (SELECT min(ID) FROM reported)
+        """
+        return self.__execute(sql, fetchone=True, commit=True)
+
+    def delete_from_reported(self, telegram_id: int):
+        sql = f"""
+        DELETE FROM reported
+        WHERE telegram_id = {telegram_id}
+        """
+        return self.__execute(sql, commit=True)
