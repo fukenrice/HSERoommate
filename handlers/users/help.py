@@ -1,11 +1,12 @@
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandHelp
 from aiogram.dispatcher import FSMContext
+from keyboards.default import menu_keyboard
 from loader import dp
 from states.general_states import GeneralStates
 
 
-@dp.message_handler(CommandHelp(), state="*")
+@dp.message_handler(lambda msg: msg.text in ["/help", "Помощь"], state="*")
 async def bot_help(message: types.Message, state: FSMContext):
     await GeneralStates.main_menu.set()
     text = ("Как отредактировать анкету?",
@@ -17,4 +18,4 @@ async def bot_help(message: types.Message, state: FSMContext):
             "Что делать, если я не нашёл ответ на свой вопрос?",
             "Писать в лс @ArsBars")
 
-    await message.answer("\n".join(text), reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("\n".join(text), reply_markup=menu_keyboard.main_keyboard)

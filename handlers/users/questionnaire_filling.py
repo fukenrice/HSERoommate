@@ -2,17 +2,18 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
-from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard, how_long_keyboard, smoking_keyboard, budget_keyboard, location_local_keyboard, location_global_keyboard
+from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard,\
+    how_long_keyboard, smoking_keyboard, budget_keyboard, location_local_keyboard, location_global_keyboard, main_keyboard
 from loader import dp, bot, db
 from states.questionnaire_states import QuestionnaireStates
 from states.general_states import GeneralStates
 
 
-@dp.message_handler(Command("new_form"), state="*")
+@dp.message_handler(lambda msg: msg.text in ["/new_form", "Заполнить новую анкету"], state="*")
 async def start_polling(msg: types.Message, state: FSMContext):
     await GeneralStates.main_menu.set()
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
-        await msg.answer(text="Твоя анкета уже находится в базе, ты можешь ее удалить, а потом создать новую.")
+        await msg.answer(text="Твоя анкета уже находится в базе, ты можешь ее удалить, а потом создать новую.", reply_markup=main_keyboard)
         await state.finish()
     else:
         await msg.answer(text="Как тебя зовут?")
