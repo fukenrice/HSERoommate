@@ -123,6 +123,6 @@ async def end_of_questionnaire(msg: types.Message, state: FSMContext):
                 data.get("rooms_number"), data.get("about"),
                 data.get("photo"), data.get("how_long"), data.get("location_global"), data.get("location_local"),
                 data.get("pet"), data.get("budget"), data.get("apartment"))
-    await msg.answer(text="Ваша анкета успешно добавлена в базу! Теперь вы можете поискать соседа, удачи в поисках!",
+    await msg.answer(text="Твоя анкета успешно добавлена в базу! Теперь вы можете поискать соседа, удачи в поисках!",
                      reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
