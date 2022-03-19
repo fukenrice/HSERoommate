@@ -137,7 +137,7 @@ async def change_roommate_gender(msg: types.Message):
     await GeneralStates.edited_roommate_gender.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["Муж", "Жен", "Не важно"], state=GeneralStates.edited_roommate_gender)
+@dp.message_handler(lambda msg: msg.text in ["Муж", "Жен", "Неважно"], state=GeneralStates.edited_roommate_gender)
 async def apply_roommate_gender(msg: types.Message, state: FSMContext):
     db.change_field('roommate_gender', f"'{msg.text}'", telegram_id=msg.from_user.id)
     await msg.answer(text="Пол соседа успешно изменен", reply_markup=main_keyboard)
