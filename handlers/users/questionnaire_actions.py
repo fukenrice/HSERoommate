@@ -3,12 +3,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
 import keyboards.default as keyboard
+from keyboards.default import main_keyboard
 from loader import dp, bot, db
 from models import Questionnaire
 from states.general_states import GeneralStates
 
 
-@dp.message_handler(Command("my_form"), state="*")
+@dp.message_handler(lambda msg: msg.text in ["/my_form", "Редактировать свою анкету"], state="*")
 async def show_questionnaire(msg: types.Message):
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
         questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
@@ -22,7 +23,7 @@ async def show_questionnaire(msg: types.Message):
     else:
         await msg.answer(
             text="Хм, не могу найти твою анкету в базе, ты можешь создать ее с помощью команды /new_form",
-            reply_markup=types.ReplyKeyboardRemove())
+            reply_markup=main_keyboard)
 
 
 @dp.message_handler(lambda msg: msg.text == "Удалить анкету", state=GeneralStates.questionnaire_edit)
@@ -30,7 +31,7 @@ async def delete_questionnaire(msg: types.Message, state: FSMContext):
     db.delete_questionnaire(msg.from_user.id)
     await msg.answer(text="Твоя акета успешно удалена, ее больше никто не увидит."
                           " В любой момент ты можешь создать новую при помощи команды /new_form",
-                     reply_markup=types.ReplyKeyboardRemove())
+                     reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -49,7 +50,7 @@ async def change_gender(msg: types.Message, state: FSMContext):
 @dp.message_handler(lambda msg: msg.text in ["Муж", "Жен"], state=GeneralStates.edited_gender)
 async def apply_gender(msg: types.Message, state: FSMContext):
     db.change_field('gender', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Твой пол успешно изменен", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Твой пол успешно изменен", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -62,7 +63,7 @@ async def change_how_long(msg: types.Message, state: FSMContext):
 @dp.message_handler(lambda msg: msg.text in ["Менее месяца", "От месяца до полугода", "Более полугода"], state=GeneralStates.edited_how_long)
 async def apply_how_long(msg: types.Message, state: FSMContext):
     db.change_field('how_long', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Длительность проживания успешно изменена", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Длительность проживания успешно изменена", reply_markup=main_keyboard)
     await state.finish()
 
 @dp.message_handler(lambda msg: msg.text == "Бюджет", state=GeneralStates.questionnaire_editing_field)
@@ -71,10 +72,10 @@ async def change_budget(msg: types.Message, state: FSMContext):
     await GeneralStates.edited_budget.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+", "Неважно"], state=GeneralStates.edited_budget)
+@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+"], state=GeneralStates.edited_budget)
 async def apply_budget(msg: types.Message, state: FSMContext):
     db.change_field('budget', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Бюджет успешно изменен", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Бюджет успешно изменен", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -86,8 +87,8 @@ async def change_location_global(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text in ["Внутри ЦАО", "В пределах ТТК", "В пределах МКАД", "За МКАД", "Неважно"], state=GeneralStates.edited_location_global)
 async def apply_location_global(msg: types.Message, state: FSMContext):
-    db.change_field('location_global', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Местоположение успешно изменено", reply_markup=types.ReplyKeyboardRemove())
+    db.change_field('location', f"'{msg.text}'", telegram_id=msg.from_user.id)
+    await msg.answer(text="Местоположение успешно изменено", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -99,8 +100,8 @@ async def change_location_local(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text in ["Запад", "Восток", "Север", "Юг", "Неважно"], state=GeneralStates.edited_location_local)
 async def apply_location_local(msg: types.Message, state: FSMContext):
-    db.change_field('location_local', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Местоположение успешно изменено", reply_markup=types.ReplyKeyboardRemove())
+    db.change_field('local_location', f"'{msg.text}'", telegram_id=msg.from_user.id)
+    await msg.answer(text="Местоположение успешно изменено", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -112,8 +113,8 @@ async def change_apartment(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=GeneralStates.edited_apartment)
 async def apply_apartment(msg: types.Message, state: FSMContext):
-    db.change_field('apartment', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Данные о квартире успешно изменены", reply_markup=types.ReplyKeyboardRemove())
+    db.change_field('found', f"'{msg.text}'", telegram_id=msg.from_user.id)
+    await msg.answer(text="Данные о квартире успешно изменены", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -126,8 +127,9 @@ async def change_pet(msg: types.Message, state: FSMContext):
 @dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=GeneralStates.edited_pet)
 async def apply_pet(msg: types.Message, state: FSMContext):
     db.change_field('pet', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Данные о животных успешно изменены", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Данные о животных успешно изменены", reply_markup=main_keyboard)
     await state.finish()
+
 
 @dp.message_handler(lambda msg: msg.text == "Пол соседа", state=GeneralStates.questionnaire_editing_field)
 async def change_roommate_gender(msg: types.Message):
@@ -135,10 +137,10 @@ async def change_roommate_gender(msg: types.Message):
     await GeneralStates.edited_roommate_gender.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["Муж", "Жен", "Не важно"], state=GeneralStates.edited_roommate_gender)
+@dp.message_handler(lambda msg: msg.text in ["Муж", "Жен", "Неважно"], state=GeneralStates.edited_roommate_gender)
 async def apply_roommate_gender(msg: types.Message, state: FSMContext):
     db.change_field('roommate_gender', f"'{msg.text}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Пол соседа успешно изменен", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Пол соседа успешно изменен", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -151,7 +153,7 @@ async def change_name(msg: types.Message):
 @dp.message_handler(state=GeneralStates.edited_name)
 async def apply_name(msg: types.Message, state: FSMContext):
     db.change_field('name', f"'{msg.text[:40]}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Имя успешно изменено", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Имя успешно изменено", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -165,7 +167,7 @@ async def change_age(msg: types.Message):
 async def apply_age(msg: types.Message, state: FSMContext):
     if msg.text.isdigit() and 17 <= int(msg.text) <= 100:
         db.change_field('age', f'{msg.text}', telegram_id=msg.from_user.id)
-        await msg.answer(text="Возраст успешно изменен", reply_markup=types.ReplyKeyboardRemove())
+        await msg.answer(text="Возраст успешно изменен", reply_markup=main_keyboard)
         await state.finish()
     else:
         await msg.answer(text="Введен некорректный возраст, попробуй снова(от 17 лет)",
@@ -181,7 +183,7 @@ async def change_smoking(msg: types.Message):
 @dp.message_handler(lambda msg: msg.text in ["Да", "Только электронные сигареты", "Нет"], state=GeneralStates.edited_smoking)
 async def apply_smoking(msg: types.Message, state: FSMContext):
     db.change_field('smoking', f"{(lambda: 1 if msg.text == 'Да' else 0)()}", telegram_id=msg.from_user.id)
-    await msg.answer(text="Курение успешно изменено!", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Курение успешно изменено!", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -194,7 +196,7 @@ async def change_about(msg: types.Message):
 @dp.message_handler(state=GeneralStates.edited_about)
 async def apply_about(msg: types.Message, state: FSMContext):
     db.change_field('about', f"'{msg.text[:869]}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Описание успешно изменено!", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Описание успешно изменено!", reply_markup=main_keyboard)
     await state.finish()
 
 
@@ -207,5 +209,5 @@ async def changing_photo(msg: types.Message):
 @dp.message_handler(content_types=["photo"], state=GeneralStates.edited_photo)
 async def apply_photo(msg: types.Message, state: FSMContext):
     db.change_field('photo_id', f"'{msg.photo[-1].file_id}'", telegram_id=msg.from_user.id)
-    await msg.answer(text="Фото успешно изменено!", reply_markup=types.ReplyKeyboardRemove())
+    await msg.answer(text="Фото успешно изменено!", reply_markup=main_keyboard)
     await state.finish()
