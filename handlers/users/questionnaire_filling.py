@@ -2,17 +2,18 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
-from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard, how_long_keyboard, smoking_keyboard, budget_keyboard, location_local_keyboard, location_global_keyboard
+from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard,\
+    how_long_keyboard, smoking_keyboard, budget_keyboard, location_local_keyboard, location_global_keyboard, main_keyboard
 from loader import dp, bot, db
 from states.questionnaire_states import QuestionnaireStates
 from states.general_states import GeneralStates
 
 
-@dp.message_handler(Command("new_form"), state="*")
+@dp.message_handler(lambda msg: msg.text in ["/new_form", "Заполнить новую анкету"], state="*")
 async def start_polling(msg: types.Message, state: FSMContext):
     await GeneralStates.main_menu.set()
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
-        await msg.answer(text="Твоя анкета уже находится в базе, ты можешь ее удалить, а потом создать новую.")
+        await msg.answer(text="Твоя анкета уже находится в базе, ты можешь ее удалить, а потом создать новую.", reply_markup=main_keyboard)
         await state.finish()
     else:
         await msg.answer(text="Как тебя зовут?")
@@ -79,7 +80,7 @@ async def budget_question(msg: types.Message, state: FSMContext):
     await QuestionnaireStates.budget_question.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+", "Неважно"], state=QuestionnaireStates.budget_question)
+@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+"], state=QuestionnaireStates.budget_question)
 async def apartment_question(msg: types.Message, state: FSMContext):
     await state.update_data(budget=msg.text)
     await msg.answer(text="Нашел ли ты уже квартиру?", reply_markup=binary_keyboard)
@@ -120,7 +121,8 @@ async def end_of_questionnaire(msg: types.Message, state: FSMContext):
     db.add_user(msg.from_user.id, data.get("name"), int(data.get("age")), data.get("gender"),
                 data.get("roommate_gender"), (lambda: 1 if data.get("smoking") == "Да" else 0)(),
                 data.get("rooms_number"), data.get("about"),
-                data.get("photo"))
-    await msg.answer(text="Твоя анкета успешно добавлена в базу! Теперь ты можешь поискать соседа, удачи в поисках!",
+                data.get("photo"), data.get("how_long"), data.get("location_global"), data.get("location_local"),
+                data.get("pet"), data.get("budget"), data.get("apartment"))
+    await msg.answer(text="Твоя анкета успешно добавлена в базу! Теперь вы можете поискать соседа, удачи в поисках!\nДля этого нажми /show",
                      reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
