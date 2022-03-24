@@ -72,7 +72,7 @@ async def change_budget(msg: types.Message, state: FSMContext):
     await GeneralStates.edited_budget.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+", "Неважно"], state=GeneralStates.edited_budget)
+@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+"], state=GeneralStates.edited_budget)
 async def apply_budget(msg: types.Message, state: FSMContext):
     db.change_field('budget', f"'{msg.text}'", telegram_id=msg.from_user.id)
     await msg.answer(text="Бюджет успешно изменен", reply_markup=main_keyboard)
