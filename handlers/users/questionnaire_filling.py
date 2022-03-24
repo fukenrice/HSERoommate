@@ -80,7 +80,7 @@ async def budget_question(msg: types.Message, state: FSMContext):
     await QuestionnaireStates.budget_question.set()
 
 
-@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+", "Неважно"], state=QuestionnaireStates.budget_question)
+@dp.message_handler(lambda msg: msg.text in ["10-15к", "15-25к", "25-35к", "35к+"], state=QuestionnaireStates.budget_question)
 async def apartment_question(msg: types.Message, state: FSMContext):
     await state.update_data(budget=msg.text)
     await msg.answer(text="Нашел ли ты уже квартиру?", reply_markup=binary_keyboard)
@@ -123,6 +123,6 @@ async def end_of_questionnaire(msg: types.Message, state: FSMContext):
                 data.get("rooms_number"), data.get("about"),
                 data.get("photo"), data.get("how_long"), data.get("location_global"), data.get("location_local"),
                 data.get("pet"), data.get("budget"), data.get("apartment"))
-    await msg.answer(text="Твоя анкета успешно добавлена в базу! Теперь вы можете поискать соседа, удачи в поисках!",
+    await msg.answer(text="Твоя анкета успешно добавлена в базу! Теперь вы можете поискать соседа, удачи в поисках!\nДля этого нажми /show",
                      reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
