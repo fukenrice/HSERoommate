@@ -76,9 +76,6 @@ budget_keyboard = ReplyKeyboardMarkup(
             KeyboardButton("15-25к"),
             KeyboardButton("25-35к"),
             KeyboardButton("35к+")
-        ],
-        [
-            KeyboardButton("Неважно")
         ]
     ], resize_keyboard=True
 )
