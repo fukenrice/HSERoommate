@@ -12,7 +12,7 @@ from data.config import MODERATORS as moders
 async def show_next(msg: types.Message, state: FSMContext):
     record = db.get_next_reported_que()
     if record is None:
-        await msg.answer(text="Пока чисто, работы нет")
+        await msg.answer(text="Пока чисто, работы нет", reply_markup=types.ReplyKeyboardRemove())
     else:
         id = record[1]
         while not db.questionnaire_in_table(telegram_id=id):

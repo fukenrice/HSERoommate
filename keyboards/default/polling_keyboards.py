@@ -46,8 +46,10 @@ location_global_keyboard = ReplyKeyboardMarkup(
         [
             KeyboardButton("Внутри ЦАО"),
             KeyboardButton("В пределах ТТК"),
+        ],
+        [
             KeyboardButton("В пределах МКАД"),
-            KeyboardButton("За МКАД")
+            KeyboardButton("За МКАД"),
         ],
         [
             KeyboardButton("Неважно")
