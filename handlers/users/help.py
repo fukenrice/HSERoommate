@@ -10,7 +10,7 @@ from states.general_states import GeneralStates
 async def bot_help(message: types.Message, state: FSMContext):
     await GeneralStates.main_menu.set()
     text = ("Как отредактировать анкету?",
-            "Выбери команду my_form и нажми на соответствующую кнопку.\n",
+            "Выбери команду /my_form и нажми на соответствующую кнопку.\n",
             "Что делать, если бот лагает?",
             "Это связано с временной перегруженностью серверов - такое бывает крайне редко. Не волнуйся, в ближайшее время всё придёт в норму.\n",
             "Как удалить анкету?",
