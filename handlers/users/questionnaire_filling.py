@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
+from aiogram.types.message import ContentType
 
 from keyboards.default import gender_keyboard, roommate_gender_keyboard, binary_keyboard, room_num_keyboard,\
     how_long_keyboard, smoking_keyboard, budget_keyboard, location_local_keyboard, location_global_keyboard, main_keyboard
@@ -114,9 +115,15 @@ async def photo_question(msg: types.Message, state: FSMContext):
     await QuestionnaireStates.end_of_questionnaire.set()
 
 
+@dp.message_handler(lambda msg: msg.content_type != ContentType.PHOTO, state=QuestionnaireStates.end_of_questionnaire)
+async def photo_reminder(msg: types.message):
+    await msg.answer(text="Пожалуйста отправь мне фотографию(не как файл)")
+
+
 @dp.message_handler(content_types=["photo"], state=QuestionnaireStates.end_of_questionnaire)
 async def end_of_questionnaire(msg: types.Message, state: FSMContext):
     await state.update_data(photo=msg.photo[-1].file_id)
+    msg.content_type
     data = await state.get_data()
     db.add_user(msg.from_user.id, data.get("name"), int(data.get("age")), data.get("gender"),
                 data.get("roommate_gender"), (lambda: 1 if data.get("smoking") == "Да" else 0)(),
