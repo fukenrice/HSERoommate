@@ -26,6 +26,6 @@ class Questionnaire:
                f"Хочу снимать {self.how_long.lower()}\n" \
                f"{'Против домашних животных' if self.roommate_pets == 'Нет' else 'Не против домашних животных'}\n" \
                f"Желаемое количество комнат: {self.rooms_number}\n" \
-               f"Бюджет {self.budget}\n" \
+               f"Бюджет с человека {self.budget}\n" \
                f"{'Уже нашел варианты квартир' if self.found == 'Да' else 'Пока ищу варианты квартир'}\n" \
                f"{self.about}"
