@@ -94,7 +94,7 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
 
         try:
             await bot.send_photo(chat_id=other_questionnaire.telegram_id, photo=user_questionnaire.photo,
-                                 caption=f"Ваша анкта понравилась человеку:\n"
+                                 caption=f"Ваша анкета понравилась человеку:\n"
                                          f"Пол: {user_questionnaire.gender}\n"
                                          f"{user_questionnaire}\n"
                                          f"Вот его ник тг: @{msg.from_user.username}")
