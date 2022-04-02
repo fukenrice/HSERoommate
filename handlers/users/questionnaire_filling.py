@@ -77,7 +77,7 @@ async def pet_question(msg: types.Message, state: FSMContext):
 @dp.message_handler(lambda msg: msg.text in ["Да", "Нет"], state=QuestionnaireStates.pet_question)
 async def budget_question(msg: types.Message, state: FSMContext):
     await state.update_data(pet=msg.text)
-    await msg.answer(text="Каков твой бюджет для аренды квартиры?", reply_markup=budget_keyboard)
+    await msg.answer(text="Каков твой бюджет для аренды квартиры? (с человека)", reply_markup=budget_keyboard)
     await QuestionnaireStates.budget_question.set()
 
 
