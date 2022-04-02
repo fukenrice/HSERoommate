@@ -68,7 +68,7 @@ async def apply_how_long(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(lambda msg: msg.text == "Бюджет", state=GeneralStates.questionnaire_editing_field)
 async def change_budget(msg: types.Message, state: FSMContext):
-    await msg.answer(text="Каков твой бюджет для аренды квартиры?", reply_markup=keyboard.budget_keyboard)
+    await msg.answer(text="Каков твой бюджет для аренды квартиры? (с человека)", reply_markup=keyboard.budget_keyboard)
     await GeneralStates.edited_budget.set()
 
 
