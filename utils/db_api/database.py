@@ -14,7 +14,6 @@ class DataBase:
         data = None
         cursor.execute(sql)
 
-
         if fetchall:
             data = cursor.fetchall()
         if fetchone:
@@ -45,7 +44,7 @@ class DataBase:
         else:
             return not self.get_next_questionnaire_by_search_id(search_id, roommate_gender, telegram_id) is None
 
-    def get_questionnaire_by_urser_id(self, telegram_id: int):
+    def get_questionnaire_by_user_id(self, telegram_id: int):
         sql = f"""
         SELECT * FROM questionnaires
         WHERE telegram_id = {telegram_id}
@@ -72,12 +71,14 @@ class DataBase:
             sql = f"""
                 SELECT * FROM questionnaires
                 WHERE ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
+                AND telegram_id NOT IN (select liked_id from likes where liker_id = {ignore_tg_id})
             """
         else:
             sql = f"""
             SELECT * FROM questionnaires
             WHERE gender = '{roommate_gender}'
             AND ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
+            AND telegram_id NOT IN (select liked_id from likes where liker_id = {ignore_tg_id})
             """
         return self.__execute(sql, fetchone=True, commit=True)
 
@@ -106,5 +107,12 @@ class DataBase:
         sql = f"""
         DELETE FROM reported
         WHERE telegram_id = {telegram_id}
+        """
+        return self.__execute(sql, commit=True)
+
+    def add_like(self, liker_id: int, liked_id: int):
+        sql = f"""
+        INSERT OR IGNORE INTO likes
+        VALUES ({liker_id}, {liked_id})
         """
         return self.__execute(sql, commit=True)

@@ -1,12 +1,10 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Command
 
 from keyboards.default import scrolling_keyboard, main_keyboard
 from loader import dp, bot, db
 from models.questionnaire import Questionnaire
 from states.general_states import GeneralStates
-from data.config import MODERATORS as moder
 
 
 async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questionnaire, state: FSMContext):
@@ -54,7 +52,7 @@ async def start_scrolling(msg: types.Message, state: FSMContext):
         await state.finish()
     else:
         # Получение анкеты пользователя из бд для параметров поиска.
-        user_questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
+        user_questionnaire = Questionnaire(db.get_questionnaire_by_user_id(msg.from_user.id))
         async with state.proxy() as data:
             data["roommate_gender"] = user_questionnaire.roommate_gender
             try:
@@ -76,7 +74,7 @@ async def continue_scrolling_negative(msg: types.Message, state: FSMContext):
         if reported is not None:
             db.add_reported(reported.telegram_id)
 
-    user_questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
+    user_questionnaire = Questionnaire(db.get_questionnaire_by_user_id(msg.from_user.id))
     async with state.proxy() as data:
         search_id = data["current_id"]
     await show_next(user_questionnaire, search_id, msg, state)
@@ -87,11 +85,11 @@ async def continue_scrolling_posititve(msg: types.Message, state: FSMContext):
     # Отправим пользователю, которого лвйкнули сообщение.
     async with state.proxy() as data:
         search_id = data["current_id"]
-    user_questionnaire = Questionnaire(db.get_questionnaire_by_urser_id(msg.from_user.id))
+    user_questionnaire = Questionnaire(db.get_questionnaire_by_user_id(msg.from_user.id))
     liked = db.questionnaire_by_search_id(search_id - 1)
     if liked is not None:
         other_questionnaire = Questionnaire(liked)
-
+        db.add_like(user_questionnaire.telegram_id, other_questionnaire.telegram_id)
         try:
             await bot.send_photo(chat_id=other_questionnaire.telegram_id, photo=user_questionnaire.photo,
                                  caption=f"Ваша анкета понравилась человеку:\n"
