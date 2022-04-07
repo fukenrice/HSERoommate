@@ -17,7 +17,7 @@ async def start_polling(msg: types.Message, state: FSMContext):
         await msg.answer(text="Твоя анкета уже находится в базе, ты можешь ее удалить, а потом создать новую.", reply_markup=main_keyboard)
         await state.finish()
     else:
-        await msg.answer(text="Как тебя зовут?")
+        await msg.answer(text="Как тебя зовут?", reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
         await QuestionnaireStates.name_question.set()
 

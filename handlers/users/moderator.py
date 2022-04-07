@@ -17,7 +17,7 @@ async def show_next(msg: types.Message, state: FSMContext):
         id = record[1]
         while not db.questionnaire_in_table(telegram_id=id):
             db.delete_from_reported(id)
-        que = Questionnaire(db.get_questionnaire_by_urser_id(id))
+        que = Questionnaire(db.get_questionnaire_by_user_id(id))
         await msg.answer_photo(photo=que.photo, caption=str(que), reply_markup=moderator_keyboard)
         await ModeratorStates.moderating.set()
         async with state.proxy() as data:
