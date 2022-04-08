@@ -20,7 +20,7 @@ class Questionnaire:
 
     def __str__(self):
         return f"{self.name}\n" \
-               f"{self.age} лет\n" \
+               f"{self.age} {'год' if self.age%10==1 else 'года' if 1 < self.age % 10 < 5 else 'лет'}\n" \
                f"{'Курю' if self.smoking == 1 else 'Не курю'}\n" \
                f"Ищу квартиру {self.location}, {self.local_location}\n" \
                f"Хочу снимать {self.how_long.lower()}\n" \
