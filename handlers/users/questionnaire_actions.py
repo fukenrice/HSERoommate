@@ -15,7 +15,6 @@ async def show_questionnaire(msg: types.Message):
         questionnaire = Questionnaire(db.get_questionnaire_by_user_id(msg.from_user.id))
         await msg.answer_photo(photo=questionnaire.photo, caption=f"Вот твоя анкета:\n"
                                                                   f"{questionnaire}\n"
-                                                                  f"Пол: {questionnaire.gender}\n"
                                                                   f"Пол соседа: {questionnaire.roommate_gender}",
                                reply_markup=keyboard.my_questionnaire_keyboard)
         await GeneralStates.questionnaire_edit.set()

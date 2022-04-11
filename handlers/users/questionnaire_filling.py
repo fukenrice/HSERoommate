@@ -110,7 +110,7 @@ async def about_question(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state=QuestionnaireStates.about_question)
 async def photo_question(msg: types.Message, state: FSMContext):
-    await state.update_data(about=msg.text[:799])
+    await state.update_data(about=msg.text[:700])
     await msg.answer(text="Отлично, для завершения заполнения анкеты отправь мне свою фотографию", reply_markup=types.ReplyKeyboardRemove())
     await QuestionnaireStates.end_of_questionnaire.set()
 
@@ -123,7 +123,6 @@ async def photo_reminder(msg: types.message):
 @dp.message_handler(content_types=["photo"], state=QuestionnaireStates.end_of_questionnaire)
 async def end_of_questionnaire(msg: types.Message, state: FSMContext):
     await state.update_data(photo=msg.photo[-1].file_id)
-    msg.content_type
     data = await state.get_data()
     db.add_user(msg.from_user.id, data.get("name"), int(data.get("age")), data.get("gender"),
                 data.get("roommate_gender"), (lambda: 1 if data.get("smoking") == "Да" else 0)(),
