@@ -34,7 +34,7 @@ class DataBase:
         """
         self.__execute(sql, commit=True)
 
-    def questionnaire_in_table(self, telegram_id: int = None, search_id: int = -1, roommate_gender: str = None) -> bool:
+    def questionnaire_in_table(self, telegram_id: int = None, search_id: int = -1, roommate_gender: str = None, user_gender: str = None) -> bool:
         if search_id == -1:
             sql = f"""
             SELECT EXISTS(SELECT telegram_id FROM questionnaires
@@ -42,7 +42,7 @@ class DataBase:
             """
             return not self.__execute(sql, fetchone=True, commit=True)[0] == 0
         else:
-            return not self.get_next_questionnaire_by_search_id(search_id, roommate_gender, telegram_id) is None
+            return not self.get_next_questionnaire_by_search_id(search_id, roommate_gender, telegram_id, user_gender) is None
 
     def get_questionnaire_by_user_id(self, telegram_id: int):
         sql = f"""
@@ -66,12 +66,13 @@ class DataBase:
         """
         self.__execute(sql, commit=True)
 
-    def get_next_questionnaire_by_search_id(self, search_id: int, roommate_gender: str, ignore_tg_id: int):
+    def get_next_questionnaire_by_search_id(self, search_id: int, roommate_gender: str, ignore_tg_id: int, user_gender: str):
         if roommate_gender == "Неважно":
             sql = f"""
                 SELECT * FROM questionnaires
                 WHERE ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
                 AND telegram_id NOT IN (select liked_id from likes where liker_id = {ignore_tg_id})
+                AND roommate_gender IN ('{user_gender}', 'Неважно')
             """
         else:
             sql = f"""
@@ -79,6 +80,7 @@ class DataBase:
             WHERE gender = '{roommate_gender}'
             AND ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
             AND telegram_id NOT IN (select liked_id from likes where liker_id = {ignore_tg_id})
+            AND roommate_gender IN ('{user_gender}', 'Неважно')
             """
         return self.__execute(sql, fetchone=True, commit=True)
 

@@ -17,20 +17,20 @@ async def send_questionnaire(msg: types.Message, roommate_questionnaire: Questio
 async def show_next(user_questionnaire: Questionnaire, search_id: int, msg: types.message, state: FSMContext):
     # Есть ли вообще записи в таблице
     if db.questionnaire_in_table(search_id=0, roommate_gender=user_questionnaire.roommate_gender,
-                                 telegram_id=user_questionnaire.telegram_id):
+                                 telegram_id=user_questionnaire.telegram_id, user_gender=user_questionnaire.gender):
         # Если есть след запись
         if db.questionnaire_in_table(search_id=search_id, roommate_gender=user_questionnaire.roommate_gender,
-                                     telegram_id=user_questionnaire.telegram_id):
+                                     telegram_id=user_questionnaire.telegram_id, user_gender=user_questionnaire.gender):
             roommate_questionnaire = Questionnaire(
                 db.get_next_questionnaire_by_search_id(search_id, user_questionnaire.roommate_gender,
-                                                       ignore_tg_id=user_questionnaire.telegram_id))
+                                                       ignore_tg_id=user_questionnaire.telegram_id, user_gender=user_questionnaire.gender))
             await send_questionnaire(msg, roommate_questionnaire, state)
         # Показываем первую, запускаем второй круг
         else:
             search_id = 0
             roommate_questionnaire = Questionnaire(
                 db.get_next_questionnaire_by_search_id(search_id, user_questionnaire.roommate_gender,
-                                                       ignore_tg_id=user_questionnaire.telegram_id))
+                                                       ignore_tg_id=user_questionnaire.telegram_id, user_gender=user_questionnaire.gender))
             await send_questionnaire(msg, roommate_questionnaire, state)
     # Записей, подходящих под условие нет совсем
     else:
