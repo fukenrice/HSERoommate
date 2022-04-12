@@ -19,7 +19,9 @@ class Questionnaire:
         self.found = attributes[15]
 
     def __str__(self):
-        return f"{self.gender[0].upper()}, {self.name}, " \
+        male = "\N{MAN}"
+        female = "\N{WOMAN}"
+        return f"{male if self.gender[0].upper() == 'М' else female}, {self.name}, " \
                f"{self.age} {'год' if self.age % 10 == 1 else 'года' if 1 < self.age % 10 < 5 else 'лет'}\n" \
                f"\N{ROUND PUSHPIN}О квартире:\n"\
                f"Ищу квартиру {'неважно где' if self.location == 'Неважно' else self.location.lower() if self.local_location == 'Неважно' else (self.location.lower() + ', ' + self.local_location.lower())}\n" \
@@ -28,5 +30,5 @@ class Questionnaire:
                f"Количество комнат: {self.rooms_number.lower()}\n" \
                f"Бюджет с человека {self.budget}\n" \
                f"{'Уже нашел варианты квартир' if self.found == 'Да' else 'Пока ищу варианты квартир'}\n" \
-               f"\N{SMOKING SYMBOL}{'Курю' if self.smoking == 1 else 'Не курю'}\n" \
+               f"{'Курю' if self.smoking == 1 else 'Не курю'}\n" \
                f"\N{SPEECH BALLOON}О себе:\n{self.about}"
