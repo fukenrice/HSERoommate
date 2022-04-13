@@ -21,7 +21,7 @@ class Questionnaire:
     def __str__(self):
         male = "\N{MAN}"
         female = "\N{WOMAN}"
-        return f"{male if self.gender[0].upper() == 'М' else female}, {self.name}, " \
+        return f"{male if self.gender[0].upper() == 'М' else female} {self.name}, " \
                f"{self.age} {'год' if self.age % 10 == 1 else 'года' if 1 < self.age % 10 < 5 else 'лет'}\n" \
                f"\N{ROUND PUSHPIN}О квартире:\n"\
                f"Ищу квартиру {'неважно где' if self.location == 'Неважно' else self.location.lower() if self.local_location == 'Неважно' else (self.location.lower() + ', ' + self.local_location.lower())}\n" \
