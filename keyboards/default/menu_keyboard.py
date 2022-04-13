@@ -8,7 +8,7 @@ main_keyboard = ReplyKeyboardMarkup(
             KeyboardButton("Заполнить новую анкету"),
         ],
         [
-            KeyboardButton("Редактировать свою анкету"),
+            KeyboardButton("Посмотреть свою анкету"),
             KeyboardButton("Посмотреть анкеты")
         ],
         [

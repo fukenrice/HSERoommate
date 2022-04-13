@@ -5,6 +5,9 @@ my_questionnaire_keyboard = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="Редактировать анкету"),
             KeyboardButton(text="Удалить анкету"),
+        ],
+        [
+            KeyboardButton(text="Назад")
         ]
     ], resize_keyboard=True
 )

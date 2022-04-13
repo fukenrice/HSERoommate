@@ -7,9 +7,10 @@ from keyboards.default import main_keyboard
 from loader import dp, bot, db
 from models import Questionnaire
 from states.general_states import GeneralStates
+from .start import bot_start
 
 
-@dp.message_handler(lambda msg: msg.text in ["/my_form", "Редактировать свою анкету"], state="*")
+@dp.message_handler(lambda msg: msg.text in ["/my_form", "Посмотреть свою анкету"], state="*")
 async def show_questionnaire(msg: types.Message):
     if db.questionnaire_in_table(telegram_id=msg.from_user.id):
         questionnaire = Questionnaire(db.get_questionnaire_by_user_id(msg.from_user.id))
@@ -38,6 +39,11 @@ async def delete_questionnaire(msg: types.Message, state: FSMContext):
 async def show_edit_menu(msg: types.Message, state: FSMContext):
     await msg.answer(text="Что ты хочешь изменить?", reply_markup=keyboard.edit_questionnaire_keyboard)
     await GeneralStates.questionnaire_editing_field.set()
+
+
+@dp.message_handler(lambda msg: msg.text == "Назад", state=GeneralStates.questionnaire_edit)
+async def show_edit_menu(msg: types.Message, state: FSMContext):
+    await bot_start(msg, state)
 
 
 @dp.message_handler(lambda msg: msg.text == "Пол", state=GeneralStates.questionnaire_editing_field)
