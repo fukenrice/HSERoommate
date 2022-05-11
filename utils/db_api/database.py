@@ -70,17 +70,17 @@ class DataBase:
         if roommate_gender == "Неважно":
             sql = f"""
                 SELECT * FROM questionnaires
-                WHERE ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
+                WHERE ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id}
                 AND telegram_id NOT IN (select liked_id from likes where liker_id = {ignore_tg_id})
-                AND roommate_gender IN ('{user_gender}', 'Неважно')
+                AND roommate_gender IN ('{user_gender}', 'Неважно'))
             """
         else:
             sql = f"""
             SELECT * FROM questionnaires
             WHERE gender = '{roommate_gender}'
-            AND ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id})
+            AND ID = (select min(ID) from questionnaires where ID >= {search_id} AND telegram_id != {ignore_tg_id}
             AND telegram_id NOT IN (select liked_id from likes where liker_id = {ignore_tg_id})
-            AND roommate_gender IN ('{user_gender}', 'Неважно')
+            AND roommate_gender IN ('{user_gender}', 'Неважно'))
             """
         return self.__execute(sql, fetchone=True, commit=True)
 
